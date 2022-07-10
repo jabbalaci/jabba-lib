@@ -1,10 +1,14 @@
 [package]
 name = "jabba-lib"
-version = "0.1.0"
-authors = ["Laszlo Szathmary <jabba.laci@gmail.com>"]
+version = "0.1.1"
+authors = ["Laszlo Szathmary, alias Jabba Laci <jabba.laci@gmail.com>"]
 edition = "2021"
 description = "A simple utility library."
 license = "MIT"
+readme = "README.md"
+repository = "https://github.com/jabbalaci/jabba-lib"
+documentation = "https://docs.rs/jabba-lib"
+keywords = ["utility", "utils"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
