@@ -1,6 +1,7 @@
 # jabba-lib
 
-A simple utility library for Rust.
+A simple utility library for Rust. Its API was mainly inspired by the
+Python programming language.
 
 ## Some examples
 
