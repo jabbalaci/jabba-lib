@@ -19,7 +19,7 @@ pub fn is_sorted<T: PartialOrd>(v: &[T]) -> bool {
     }
 
     for i in 0..v.len() - 1 {
-        if &v[i] > &v[i + 1] {
+        if v[i] > v[i + 1] {
             return false;
         }
     }

@@ -49,5 +49,28 @@ fn main() {
 }
 ```
 
+### clipboard
+
+Supported platforms: Linux (with X server), Windows.
+
+Under Linux you must have the program `xsel` installed.
+You can install it with your package manager.
+
+Under Linux, the text is pasted on both clipboards (to "primary" and "clipboard").
+
+```rust
+let text = "hello";
+
+jabba_lib::jclipboard::check();  // verify if your platform is supported
+
+jabba_lib::jclipboard::set_text(text).unwrap();
+println!("The text {:?} was pasted on the clipboard", text);
+
+let read = jabba_lib::jclipboard::get_text().unwrap();
+println!("Contents of the clipboard: {:?}", read);
+
+assert_eq!(read, text);
+```
+
 See the folder [examples/](https://github.com/jabbalaci/jabba-lib/tree/main/examples)
 for more examples.
