@@ -68,7 +68,7 @@ pub fn set_text(text: &str) -> Result<(), &'static str> {
     cfg_if::cfg_if! {
         if #[cfg(windows)] {
             set_text_windows(text)?;
-            Ok(())
+            return Ok(());
         } else if #[cfg(unix)] {
             let result = set_text_linux(text);
             return match result {
@@ -110,13 +110,13 @@ pub fn get_text() -> Result<String, &'static str> {
     cfg_if::cfg_if! {
         if #[cfg(windows)] {
             let text = get_text_windows()?;
-            Ok(text)
+            return Ok(text);
         } else if #[cfg(unix)] {
             let result = get_text_linux();
-            match result {
+            return match result {
                 Ok(text) => Ok(text),
                 Err(_) => Err("Error: cannot read from clipboard"),
-            }
+            };
         } else {
             let platform = jos::get_operating_system_name();
             panic!("Error: unknown platform {}", platform);
@@ -129,10 +129,18 @@ pub fn get_text() -> Result<String, &'static str> {
 ////////////////////////////////
 
 #[cfg(windows)]
-use clipboard_win::{formats, get_clipboard, set_clipboard};
+use clipboard_win::formats::Unicode;
+#[cfg(windows)]
+use clipboard_win::{formats, set_clipboard, Clipboard, Getter};
 
 #[cfg(windows)]
 fn set_text_windows(text: &str) -> Result<(), &'static str> {
+    if text.is_empty() {
+        clipboard_win::raw::open().expect("open clipboard");
+        clipboard_win::raw::empty().expect("empty clipboard");
+        return Ok(());
+    }
+    // else
     let result = set_clipboard(formats::Unicode, text);
     match result {
         Ok(_) => Ok(()),
@@ -142,11 +150,15 @@ fn set_text_windows(text: &str) -> Result<(), &'static str> {
 
 #[cfg(windows)]
 fn get_text_windows() -> Result<String, &'static str> {
-    let result = get_clipboard(formats::Unicode);
-    match result {
-        Ok(text) => Ok(text),
-        _ => Err("Unicode error"),
+    let mut output = String::new();
+    let _clip = Clipboard::new_attempts(10).expect("Open clipboard");
+    let size = clipboard_win::raw::size(formats::CF_TEXT);
+    if size.is_none() {
+        return Ok(output);
     }
+    // else, the clipboard is not empty
+    Unicode.read_clipboard(&mut output).expect("Read text");
+    Ok(output)
 }
 
 //////////////////////////////
@@ -209,22 +221,17 @@ mod tests {
         assert_eq!(check(), ());
     }
 
+    #[test]
     fn set_text_and_get_text_test() {
         check();
         let backup = get_text().unwrap();
         //
-        let s = "";
-        set_text(s).unwrap();
-        assert_eq!(get_text().unwrap(), s);
-        //
-        let s = "a";
-        set_text(s).unwrap();
-        assert_eq!(get_text().unwrap(), s);
-        //
-        let s = "rust is cool";
-        set_text(s).unwrap();
-        assert_eq!(get_text().unwrap(), s);
+        for &s in &["", "a", "aa", "hello", "rust is cool", "Éva"] {
+            set_text(s).unwrap();
+            assert_eq!(get_text().unwrap(), s);
+        }
         //
         set_text(&backup).unwrap();
+        assert_eq!(get_text().unwrap(), backup);
     }
 }

@@ -1,6 +1,6 @@
 [package]
 name = "jabba-lib"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Laszlo Szathmary, alias Jabba Laci <jabba.laci@gmail.com>"]
 edition = "2021"
 description = "A simple utility library, inspired mainly by Python."
