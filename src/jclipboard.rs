@@ -131,34 +131,27 @@ pub fn get_text() -> Result<String, &'static str> {
 #[cfg(windows)]
 use clipboard_win::formats::Unicode;
 #[cfg(windows)]
-use clipboard_win::{formats, set_clipboard, Clipboard, Getter};
+use clipboard_win::{Clipboard, Getter, Setter};
 
 #[cfg(windows)]
 fn set_text_windows(text: &str) -> Result<(), &'static str> {
-    if text.is_empty() {
-        clipboard_win::raw::open().expect("open clipboard");
-        clipboard_win::raw::empty().expect("empty clipboard");
-        return Ok(());
-    }
-    // else
-    let result = set_clipboard(formats::Unicode, text);
+    let _clip = Clipboard::new_attempts(10).expect("Open clipboard");
+    let result = Unicode.write_clipboard(&text);
     match result {
         Ok(_) => Ok(()),
-        _ => Err("Unicode error"),
+        _ => Err("cannot write to clipboard"),
     }
 }
 
 #[cfg(windows)]
 fn get_text_windows() -> Result<String, &'static str> {
-    let mut output = String::new();
     let _clip = Clipboard::new_attempts(10).expect("Open clipboard");
-    let size = clipboard_win::raw::size(formats::CF_TEXT);
-    if size.is_none() {
-        return Ok(output);
+    let mut output = String::new();
+    let result = Unicode.read_clipboard(&mut output);
+    match result {
+        Ok(_) => Ok(output),
+        _ => Err("cannot read clipboard"),
     }
-    // else, the clipboard is not empty
-    Unicode.read_clipboard(&mut output).expect("Read text");
-    Ok(output)
 }
 
 //////////////////////////////

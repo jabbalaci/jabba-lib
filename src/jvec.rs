@@ -26,6 +26,50 @@ pub fn is_sorted<T: PartialOrd>(v: &[T]) -> bool {
     true
 }
 
+/// Returns a sorted vector (of references) of the input array / vector.
+///
+/// The returned vector contains references.
+///
+/// # Examples
+///
+/// ```
+/// let array = [8, 2, 9, 3];
+/// assert_eq!(jabba_lib::jvec::sorted_ref(&array), vec![&2, &3, &8, &9]);
+///
+/// let v = vec![8, 2, 9, 3];
+/// assert_eq!(jabba_lib::jvec::sorted_ref(&v), vec![&2, &3, &8, &9]);
+/// ```
+pub fn sorted_ref<T: Ord>(v: &[T]) -> Vec<&T> {
+    let mut copy = v.into_iter().collect::<Vec<_>>();
+    copy.sort();
+    copy
+}
+
+/// Returns a sorted copy (a vector) of the input array / vector.
+///
+/// The returned vector contains copies.
+///
+/// # Examples
+///
+/// ```
+/// let array = [8, 2, 9, 3];
+/// assert_eq!(jabba_lib::jvec::sorted_copy(&array), vec![2, 3, 8, 9]);
+///
+/// let v = vec![8, 2, 9, 3];
+/// assert_eq!(jabba_lib::jvec::sorted_copy(&v), vec![2, 3, 8, 9]);
+///
+/// let mut v = vec![6, 1, 9, 2, 0];
+/// let sorted = jabba_lib::jvec::sorted_copy(&v);
+/// v[0] = 99;
+/// assert_eq!(v, vec![99, 1, 9, 2, 0]);
+/// assert_eq!(sorted, vec![0, 1, 2, 6, 9]);
+/// ```
+pub fn sorted_copy<T: Ord + Clone>(v: &[T]) -> Vec<T> {
+    let mut copy: Vec<T> = v.into_iter().map(|x| (*x).clone()).collect();
+    copy.sort();
+    copy
+}
+
 // ==========================================================================
 
 #[cfg(test)]
@@ -62,5 +106,32 @@ mod tests {
         //
         assert_eq!(is_sorted(&vec!["aa", "cc", "bb"]), false);
         assert_eq!(is_sorted(&vec!["aa", "bb", "cc", "bb"]), false);
+    }
+
+    #[test]
+    fn sorted_ref_test1() {
+        let array = [8, 2, 9, 3];
+        assert_eq!(sorted_ref(&array), vec![&2, &3, &8, &9]);
+
+        let v = Vec::<i32>::new();
+        assert_eq!(sorted_ref(&v), Vec::<&i32>::new());
+
+        let v = ["bb", "cc", "aa"];
+        assert_eq!(sorted_ref(&v), vec![&"aa", &"bb", &"cc"]);
+    }
+
+    #[test]
+    fn sorted_copy_test1() {
+        let mut v = vec![6, 1, 9, 2, 0];
+        let sorted = sorted_copy(&v);
+        v[0] = 99;
+        assert_eq!(v, vec![99, 1, 9, 2, 0]);
+        assert_eq!(sorted, vec![0, 1, 2, 6, 9]);
+
+        let array = [8, 2, 9, 3];
+        assert_eq!(sorted_copy(&array), vec![2, 3, 8, 9]);
+
+        let v = ["bb", "cc", "aa"];
+        assert_eq!(sorted_copy(&v), vec!["aa", "bb", "cc"]);
     }
 }
