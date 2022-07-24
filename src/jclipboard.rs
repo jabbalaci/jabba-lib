@@ -68,10 +68,10 @@ pub fn set_text(text: &str) -> Result<(), &'static str> {
     cfg_if::cfg_if! {
         if #[cfg(windows)] {
             set_text_windows(text)?;
-            return Ok(());
+            Ok(())
         } else if #[cfg(unix)] {
             let result = set_text_linux(text);
-            return match result {
+            match result {
                 Ok(_) => Ok(()),
                 Err(_) => Err("Error: cannot write to clipboard"),
             }
@@ -110,13 +110,13 @@ pub fn get_text() -> Result<String, &'static str> {
     cfg_if::cfg_if! {
         if #[cfg(windows)] {
             let text = get_text_windows()?;
-            return Ok(text);
+            Ok(text)
         } else if #[cfg(unix)] {
             let result = get_text_linux();
-            return match result {
+            match result {
                 Ok(text) => Ok(text),
                 Err(_) => Err("Error: cannot read from clipboard"),
-            };
+            }
         } else {
             let platform = jos::get_operating_system_name();
             panic!("Error: unknown platform {}", platform);

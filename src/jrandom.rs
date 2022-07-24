@@ -1,7 +1,7 @@
 //! random
 
 use rand::seq::SliceRandom;
-use rand::Rng; // for shuffle
+use rand::Rng;
 
 /// Returns a random i32 from range `[lo, hi)`, where `lo` is included
 /// and `hi` is excluded.
@@ -40,7 +40,7 @@ pub fn randint(lo: i32, hi: i32) -> i32 {
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```
 /// let mut numbers = vec![1, 2, 3, 4, 5];
 /// jabba_lib::jrandom::shuffle(&mut numbers);
 /// // now the elements in `numbers` are shuffled
@@ -50,6 +50,42 @@ pub fn shuffle<T>(v: &mut [T]) {
     let mut rng = rand::thread_rng();
 
     v.shuffle(&mut rng);
+}
+
+/// Returns an `f64` from the interval `[0.0, 1.0)`.
+///
+/// Similar to Python's `random.random()`.
+///
+/// # Examples
+///
+/// ```
+/// let number = jabba_lib::jrandom::random();
+/// // now 0.0 <= number < 1.0
+/// ```
+pub fn random() -> f64 {
+    let mut rng = rand::thread_rng();
+
+    rng.gen::<f64>()
+}
+
+/// Chooses a random element from an array / vector.
+///
+/// Returns `None` if the array / vector is empty.
+///
+/// # Examples
+///
+/// ```
+/// let v = vec![1, 2, 3];
+/// let elem: &i32 = jabba_lib::jrandom::choice(&v).unwrap();
+/// // elem is now 1 or 2 or 3
+/// ```
+pub fn choice<T>(v: &[T]) -> Option<&T> {
+    if v.is_empty() {
+        return None;
+    }
+    // else
+    let idx = randrange(0, v.len() as i32) as usize;
+    Some(&v[idx])
 }
 
 // ==========================================================================
@@ -146,5 +182,29 @@ mod tests {
         assert!(v != backup);
         v.sort();
         assert!(v == backup);
+    }
+
+    #[test]
+    fn random_test1() {
+        for _ in 0..100 {
+            let number = random();
+            assert!(number >= 0.0 && number < 1.0)
+        }
+    }
+
+    #[test]
+    fn choice_test1() {
+        let v = vec![1, 2, 3];
+        for _ in 0..100 {
+            let &elem = choice(&v).unwrap();
+            assert!(v.contains(&elem));
+        }
+    }
+
+    #[test]
+    fn choice_test2() {
+        let empty = Vec::<i32>::new();
+        let elem = choice(&empty);
+        assert_eq!(elem, None);
     }
 }

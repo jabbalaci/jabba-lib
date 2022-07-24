@@ -10,9 +10,9 @@ use std::time::Duration;
 ///
 /// # Examples
 ///
-/// ```ignore
-/// // wait 0.5 seconds
-/// jabba_lib::jtime::sleep(0.5);
+/// ```
+/// // wait 0.05 seconds
+/// jabba_lib::jtime::sleep(0.05);
 /// ```
 pub fn sleep(secs: f64) {
     thread::sleep(Duration::from_secs_f64(secs));

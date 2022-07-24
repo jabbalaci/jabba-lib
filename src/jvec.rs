@@ -40,7 +40,7 @@ pub fn is_sorted<T: PartialOrd>(v: &[T]) -> bool {
 /// assert_eq!(jabba_lib::jvec::sorted_ref(&v), vec![&2, &3, &8, &9]);
 /// ```
 pub fn sorted_ref<T: Ord>(v: &[T]) -> Vec<&T> {
-    let mut copy = v.into_iter().collect::<Vec<_>>();
+    let mut copy = v.iter().collect::<Vec<_>>();
     copy.sort();
     copy
 }
@@ -65,9 +65,41 @@ pub fn sorted_ref<T: Ord>(v: &[T]) -> Vec<&T> {
 /// assert_eq!(sorted, vec![0, 1, 2, 6, 9]);
 /// ```
 pub fn sorted_copy<T: Ord + Clone>(v: &[T]) -> Vec<T> {
-    let mut copy: Vec<T> = v.into_iter().map(|x| (*x).clone()).collect();
+    let mut copy: Vec<T> = v.iter().map(|x| (*x).clone()).collect();
     copy.sort();
     copy
+}
+
+/// Returns `true` if the array / vector is palindrome.
+///
+/// # Examples
+///
+/// ```
+/// let array1 = [8, 2, 2, 8];
+/// assert_eq!(jabba_lib::jvec::is_palindrome(&array1), true);
+///
+/// let array2 = [2, 0, 2, 2];
+/// assert_eq!(jabba_lib::jvec::is_palindrome(&array2), false);
+///
+/// let v = vec!["aa", "bb", "aa"];
+/// assert_eq!(jabba_lib::jvec::is_palindrome(&v), true);
+///
+/// ```
+pub fn is_palindrome<T: PartialEq>(v: &[T]) -> bool {
+    if v.len() < 2 {
+        return true;
+    }
+    // else
+    let mut i = 0;
+    let mut j = v.len() - 1;
+    while i < j {
+        if v[i] != v[j] {
+            return false;
+        }
+        i += 1;
+        j -= 1;
+    }
+    true
 }
 
 // ==========================================================================
@@ -133,5 +165,18 @@ mod tests {
 
         let v = ["bb", "cc", "aa"];
         assert_eq!(sorted_copy(&v), vec!["aa", "bb", "cc"]);
+    }
+
+    #[test]
+    fn is_palindrome_test() {
+        assert_eq!(is_palindrome(&Vec::<i32>::new()), true);
+        assert_eq!(is_palindrome(&[0]), true);
+        assert_eq!(is_palindrome(&[0, 1]), false);
+        assert_eq!(is_palindrome(&[1, 1]), true);
+        assert_eq!(is_palindrome(&[1, 0, 1]), true);
+        //
+        assert_eq!(is_palindrome(&[1, 9, 7, 7]), false);
+        assert_eq!(is_palindrome(&[2, 0, 2, 2]), false);
+        assert_eq!(is_palindrome(&vec![1, 9, 9, 1]), true);
     }
 }
