@@ -138,6 +138,24 @@ pub fn digits(number: u64) -> Vec<i32> {
     result
 }
 
+/// Returns the decimal digits inside a string.
+///
+/// Non-digit characters are discarded.
+///
+/// # Examples
+///
+/// ```
+/// assert_eq!(jabba_lib::jmath::digits_from_str("1977"), vec![1, 9, 7, 7]);
+/// assert_eq!(jabba_lib::jmath::digits_from_str("19abc77"), vec![1, 9, 7, 7]);
+/// assert_eq!(jabba_lib::jmath::digits_from_str("ee:ff:90:ac:de"), vec![9, 0]);
+/// ```
+pub fn digits_from_str(s: &str) -> Vec<i32> {
+    s.chars()
+        .filter(|c| c.is_ascii_digit())
+        .map(|c| char::to_digit(c, 10).unwrap() as i32)
+        .collect::<Vec<_>>()
+}
+
 /// Returns all the primes below the given number.
 ///
 /// The method uses Aristotle's sieve algorithm.
@@ -169,6 +187,78 @@ pub fn get_primes_below(size: usize) -> Vec<usize> {
         }
     }
 
+    result
+}
+
+/// Returns the divisors of the given number.
+///
+/// # Examples
+///
+/// ```
+/// let number = 28;
+/// let answer = jabba_lib::jmath::get_divisors(number);
+///
+/// assert_eq!(answer, vec![1, 2, 4, 7, 14, 28]);
+/// ```
+pub fn get_divisors(number: u64) -> Vec<u64> {
+    let mut result = vec![1];
+
+    let half = number / 2;
+    for i in 2..half + 1 {
+        if number % i == 0 {
+            result.push(i);
+        }
+    }
+
+    if number > 1 {
+        result.push(number);
+    }
+
+    result
+}
+
+/// Returns the Collatz sequence of the given number.
+///
+/// # Examples
+///
+/// ```
+/// let number = 13;
+/// let answer = jabba_lib::jmath::get_collatz_sequence(number);
+///
+/// assert_eq!(answer, vec![13, 40, 20, 10, 5, 16, 8, 4, 2, 1]);
+/// ```
+pub fn get_collatz_sequence(number: u64) -> Vec<u64> {
+    assert!(number > 0);
+
+    let mut n = number;
+    let mut result = vec![n];
+
+    while n != 1 {
+        if n % 2 == 0 {
+            n /= 2;
+        } else {
+            n = 3 * n + 1;
+        }
+        result.push(n);
+    }
+    result
+}
+
+/// Returns the factorial of the given number.
+///
+/// # Examples
+///
+/// ```
+/// let number = 5;
+/// let answer = jabba_lib::jmath::factorial(number);
+///
+/// assert_eq!(answer, 5 * 4 * 3 * 2 * 1);
+/// ```
+pub fn factorial(n: u128) -> u128 {
+    let mut result = 1;
+    for i in 2..n + 1 {
+        result *= i;
+    }
     result
 }
 
@@ -239,6 +329,21 @@ mod tests {
     }
 
     #[test]
+    fn digits_from_str_test() {
+        assert_eq!(digits_from_str("123"), [1, 2, 3]);
+        assert_eq!(digits_from_str("1977"), [1, 9, 7, 7]);
+        assert_eq!(digits_from_str("12"), [1, 2]);
+        assert_eq!(digits_from_str("1"), [1]);
+        assert_eq!(digits_from_str("0"), [0]);
+        assert_eq!(digits_from_str("10"), [1, 0]);
+        assert_eq!(digits_from_str("2022"), [2, 0, 2, 2]);
+        //
+        assert_eq!(digits_from_str("202abc2"), [2, 0, 2, 2]);
+        assert_eq!(digits_from_str("abc"), []);
+        assert_eq!(digits_from_str("aa:bb:42:ee:ff"), [4, 2]);
+    }
+
+    #[test]
     fn get_primes_below_test() {
         assert_eq!(get_primes_below(2), []);
         assert_eq!(get_primes_below(3), [2]);
@@ -248,5 +353,35 @@ mod tests {
         assert_eq!(get_primes_below(14), [2, 3, 5, 7, 11, 13]);
         //
         assert_eq!(get_primes_below(100).len(), 25);
+    }
+
+    #[test]
+    fn get_divisors_test() {
+        assert_eq!(get_divisors(1), [1]);
+        assert_eq!(get_divisors(3), [1, 3]);
+        assert_eq!(get_divisors(6), [1, 2, 3, 6]);
+        assert_eq!(get_divisors(10), [1, 2, 5, 10]);
+        assert_eq!(get_divisors(15), [1, 3, 5, 15]);
+        assert_eq!(get_divisors(21), [1, 3, 7, 21]);
+        assert_eq!(get_divisors(28), [1, 2, 4, 7, 14, 28]);
+    }
+
+    #[test]
+    fn get_collatz_sequence_test() {
+        assert_eq!(get_collatz_sequence(1), [1]);
+        assert_eq!(
+            get_collatz_sequence(13),
+            [13, 40, 20, 10, 5, 16, 8, 4, 2, 1]
+        );
+    }
+
+    #[test]
+    fn factorial_test() {
+        assert_eq!(factorial(0), 1);
+        assert_eq!(factorial(1), 1);
+        assert_eq!(factorial(2), 2);
+        assert_eq!(factorial(3), 6);
+        assert_eq!(factorial(4), 24);
+        assert_eq!(factorial(5), 120);
     }
 }

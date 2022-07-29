@@ -16,4 +16,19 @@ fn main() {
     println!("---");
     let v = jmath::get_primes_below(12);
     println!("{:?}", v);
+    println!("---");
+    println!("divisors of 28: {:?}", jmath::get_divisors(28));
+    println!("---");
+    let n = 13;
+    let seq = jmath::get_collatz_sequence(n);
+    println!(
+        "Collatz sequence of {}: {}",
+        n,
+        seq.iter()
+            .map(|x| x.to_string())
+            .collect::<Vec<_>>()
+            .join(" -> ")
+    );
+    println!("---");
+    println!("5! = {}", jmath::factorial(5));
 }

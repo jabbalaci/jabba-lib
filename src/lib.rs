@@ -9,6 +9,7 @@ pub mod jfs;
 pub mod jmath;
 pub mod jos;
 pub mod jrandom;
+pub mod jspell;
 pub mod jstring;
 pub mod jtime;
 pub mod jvec;
