@@ -1,6 +1,7 @@
 //! math
 
 use crate::jvec;
+use num_bigint::BigInt;
 
 /// Returns `true` if the given number is palindrome.
 ///
@@ -201,6 +202,8 @@ pub fn get_primes_below(size: usize) -> Vec<usize> {
 /// assert_eq!(answer, vec![1, 2, 4, 7, 14, 28]);
 /// ```
 pub fn get_divisors(number: u64) -> Vec<u64> {
+    assert!(number > 0);
+
     let mut result = vec![1];
 
     let half = number / 2;
@@ -214,6 +217,24 @@ pub fn get_divisors(number: u64) -> Vec<u64> {
         result.push(number);
     }
 
+    result
+}
+
+/// Returns the proper divisors of the given number `n`.
+///
+/// Proper divisors: numbers less than `n` which divide evenly into `n`.
+///
+/// # Examples
+///
+/// ```
+/// let number = 28;
+/// let answer = jabba_lib::jmath::get_proper_divisors(number);
+///
+/// assert_eq!(answer, vec![1, 2, 4, 7, 14]);
+/// ```
+pub fn get_proper_divisors(number: u64) -> Vec<u64> {
+    let mut result = get_divisors(number);
+    result.pop();
     result
 }
 
@@ -256,6 +277,22 @@ pub fn get_collatz_sequence(number: u64) -> Vec<u64> {
 /// ```
 pub fn factorial(n: u128) -> u128 {
     let mut result = 1;
+    for i in 2..n + 1 {
+        result *= i;
+    }
+    result
+}
+
+/// Returns the factorial of the given number as a BigInt.
+///
+/// # Examples
+///
+/// ```
+/// assert_eq!(jabba_lib::jmath::factorial_bigint(33).to_string(), "8683317618811886495518194401280000000");
+/// assert_eq!(jabba_lib::jmath::factorial_bigint(10).to_string(), jabba_lib::jmath::factorial(10).to_string());
+/// ```
+pub fn factorial_bigint(n: u128) -> BigInt {
+    let mut result = BigInt::from(1);
     for i in 2..n + 1 {
         result *= i;
     }
@@ -367,6 +404,17 @@ mod tests {
     }
 
     #[test]
+    fn get_proper_divisors_test() {
+        assert_eq!(get_proper_divisors(1), []);
+        assert_eq!(get_proper_divisors(3), [1]);
+        assert_eq!(get_proper_divisors(6), [1, 2, 3]);
+        assert_eq!(get_proper_divisors(10), [1, 2, 5]);
+        assert_eq!(get_proper_divisors(15), [1, 3, 5]);
+        assert_eq!(get_proper_divisors(21), [1, 3, 7]);
+        assert_eq!(get_proper_divisors(28), [1, 2, 4, 7, 14]);
+    }
+
+    #[test]
     fn get_collatz_sequence_test() {
         assert_eq!(get_collatz_sequence(1), [1]);
         assert_eq!(
@@ -383,5 +431,13 @@ mod tests {
         assert_eq!(factorial(3), 6);
         assert_eq!(factorial(4), 24);
         assert_eq!(factorial(5), 120);
+    }
+
+    #[test]
+    fn factorial_bigint_test() {
+        let numbers = [2, 3, 5, 7, 11, 13];
+        for &n in numbers.iter() {
+            assert_eq!(factorial(n).to_string(), factorial_bigint(n).to_string());
+        }
     }
 }

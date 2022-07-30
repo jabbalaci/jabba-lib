@@ -1,6 +1,6 @@
 //! file system
 
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader};
 
 /// Reads all the lines of a file and returns them in a vector.
@@ -23,4 +23,38 @@ pub fn readlines(fname: &str) -> io::Result<Vec<String>> {
     }
 
     Ok(lines)
+}
+
+/// Reads the content of a file and returns it in a single string.
+///
+/// It is similar to Python's `f.read()`, where `f` is a file handler.
+///
+/// # Examples
+///
+/// ```
+/// let content: String = jabba_lib::jfs::read("Cargo.toml").unwrap();
+/// ```
+pub fn read(fname: &str) -> io::Result<String> {
+    fs::read_to_string(fname)
+}
+
+// ==========================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn readlines_test1() {
+        let fname = "Cargo.toml";
+        let lines = readlines(fname).unwrap();
+        assert_eq!(lines.is_empty(), false);
+    }
+
+    #[test]
+    fn read_test1() {
+        let fname = "Cargo.toml";
+        let content = read(fname).unwrap();
+        assert_eq!(content.is_empty(), false);
+    }
 }

@@ -3,6 +3,8 @@
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
 
+use crate::jmath;
+
 /*********
   public
 **********/
@@ -21,12 +23,12 @@ use std::collections::HashMap;
 pub fn spell_number(n: u32) -> String {
     assert!(n <= 1000);
 
-    let s = n.to_string();
-    match s.len() {
-        1 => length_1(&s),
-        2 => length_2(&s),
-        3 => length_3(&s),
-        4 => length_4(&s),
+    let digits = jmath::digits(n as u64);
+    match digits.len() {
+        1 => length_1(&digits),
+        2 => length_2(&digits),
+        3 => length_3(&digits),
+        4 => length_4(&digits),
         _ => String::from("unknown"),
     }
 }
@@ -35,82 +37,85 @@ pub fn spell_number(n: u32) -> String {
   private
 ***********/
 
-static NUMBERS: Lazy<HashMap<&str, &str>> = Lazy::new(|| {
+static NUMBERS: Lazy<HashMap<i32, &str>> = Lazy::new(|| {
     HashMap::from([
-        ("0", "zero"),
-        ("1", "one"),
-        ("2", "two"),
-        ("3", "three"),
-        ("4", "four"),
-        ("5", "five"),
-        ("6", "six"),
-        ("7", "seven"),
-        ("8", "eight"),
-        ("9", "nine"),
-        ("10", "ten"),
-        ("11", "eleven"),
-        ("12", "twelve"),
-        ("13", "thirteen"),
-        ("14", "fourteen"),
-        ("15", "fifteen"),
-        ("16", "sixteen"),
-        ("17", "seventeen"),
-        ("18", "eighteen"),
-        ("19", "nineteen"),
-        ("20", "twenty"),
-        ("30", "thirty"),
-        ("40", "forty"),
-        ("50", "fifty"),
-        ("60", "sixty"),
-        ("70", "seventy"),
-        ("80", "eighty"),
-        ("90", "ninety"),
-        ("100", "one hundred"),
-        ("1000", "one thousand"),
+        (0, "zero"),
+        (1, "one"),
+        (2, "two"),
+        (3, "three"),
+        (4, "four"),
+        (5, "five"),
+        (6, "six"),
+        (7, "seven"),
+        (8, "eight"),
+        (9, "nine"),
+        (10, "ten"),
+        (11, "eleven"),
+        (12, "twelve"),
+        (13, "thirteen"),
+        (14, "fourteen"),
+        (15, "fifteen"),
+        (16, "sixteen"),
+        (17, "seventeen"),
+        (18, "eighteen"),
+        (19, "nineteen"),
+        (20, "twenty"),
+        (30, "thirty"),
+        (40, "forty"),
+        (50, "fifty"),
+        (60, "sixty"),
+        (70, "seventy"),
+        (80, "eighty"),
+        (90, "ninety"),
+        (100, "one hundred"),
+        (1000, "one thousand"),
     ])
 });
 
-fn length_1(s: &str) -> String {
-    NUMBERS.get(s).unwrap().to_string()
+fn length_1(digits: &[i32]) -> String {
+    NUMBERS.get(&digits[0]).unwrap().to_string()
 }
 
-fn length_2(s: &str) -> String {
-    // let s: Vec<char> = text.chars().collect();
-
-    if &s[..1] == "1" {
-        NUMBERS.get(s).unwrap().to_string()
+fn length_2(digits: &[i32]) -> String {
+    let n = digits[0] * 10 + digits[1];
+    if digits[0] == 1 {
+        NUMBERS.get(&n).unwrap().to_string()
     } else {
-        if &s[1..2] == "0" {
-            return NUMBERS.get(s).unwrap().to_string();
+        if digits[1] == 0 {
+            return NUMBERS.get(&n).unwrap().to_string();
         }
         // else
-        let tmp = format!("{}{}", &s[..1], '0');
-        let ref1: &str = &tmp;
-        let s2 = s[1..2].to_string();
-        let ref2: &str = &s2;
+        let n = digits[0] * 10;
         format!(
             "{}-{}",
-            NUMBERS.get(ref1).unwrap(),
-            NUMBERS.get(ref2).unwrap()
+            NUMBERS.get(&n).unwrap(),
+            NUMBERS.get(&digits[1]).unwrap()
         )
     }
 }
 
-fn length_3(text: &str) -> String {
-    let head = &text[..1];
-    let tail = &text[1..];
-    if tail == "00" {
-        format!("{} hundred", length_1(head))
-    } else if &tail[..1] == "0" {
-        let tail = &tail[1..2];
-        format!("{} hundred and {}", length_1(head), length_1(tail))
+fn length_3(digits: &[i32]) -> String {
+    let head = digits[0];
+    let tail = digits[1] * 10 + digits[2];
+    if tail == 0 {
+        // "00"
+        format!("{} hundred", length_1(&[head]))
+    } else if tail < 10 {
+        // "01", "02", ..., "09"
+        format!("{} hundred and {}", length_1(&[head]), length_1(&[tail]))
     } else {
-        format!("{} hundred and {}", length_1(head), length_2(tail))
+        let tail_digits = jmath::digits(tail as u64);
+        format!(
+            "{} hundred and {}",
+            length_1(&[head]),
+            length_2(&tail_digits)
+        )
     }
 }
 
-fn length_4(s: &str) -> String {
-    NUMBERS.get(s).unwrap().to_string()
+fn length_4(digits: &[i32]) -> String {
+    let n = digits[0] * 1000 + digits[1] * 100 + digits[2] * 10 + digits[3];
+    NUMBERS.get(&n).unwrap().to_string()
 }
 
 // ==========================================================================
@@ -160,7 +165,7 @@ mod tests {
     #[test]
     fn spell_number_test2() {
         let mut sb = String::new();
-        for n in 1..1000+1 {
+        for n in 1..1000 + 1 {
             sb.push_str(&spell_number(n));
         }
         sb = sb.replace(" ", "").replace("-", "");

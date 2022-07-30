@@ -31,4 +31,7 @@ fn main() {
     );
     println!("---");
     println!("5! = {}", jmath::factorial(5));
+    println!("---");
+    let n = 33;
+    println!("{}! = {}", n, jmath::factorial_bigint(n));
 }
