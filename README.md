@@ -1,9 +1,12 @@
 # jabba-lib
 
-A simple utility library for Rust. Its API was mainly inspired by the
+A utility library for Rust. Its API was mainly inspired by the
 Python programming language.
 
 ## Some examples
+
+This is just a teaser. The library has many more modules
+and --in most cases-- the modules contain more functions than shown below.
 
 ### console
 
@@ -17,21 +20,17 @@ fn main() {
 }
 ```
 
-### random
+### math
 
 ```rust
-use jabba_lib::jrandom;
+use jabba_lib::jmath;
 
 fn main() {
-    let number = jrandom::randrange(1, 10);  // 10 is excluded
-    println!("random number from [1, 10): {}", number);
-
-    let number = jrandom::randint(1, 100);  // 100 is included
-    println!("random number from [1, 100]: {}", number);
-
-    let mut numbers = vec![1, 2, 3, 4, 5];
-    jrandom::shuffle(&mut numbers);
-    println!("shuffled: {:?}", numbers);  // could be [3, 5, 1, 4, 2]
+    assert_eq!(jmath::is_palindrome(101), true);
+    assert_eq!(jmath::is_prime(97), true);
+    assert_eq!(jmath::get_divisors(28), [1, 2, 4, 7, 14, 28]);
+    assert_eq!(jmath::factorial(5), 120);
+    assert_eq!(jmath::factorial_bigint(33).to_string(), "8683317618811886495518194401280000000");
 }
 ```
 
@@ -42,10 +41,29 @@ use jabba_lib::jstring;
 
 fn main() {
     let name = "Dave";
-    let reversed = jstring::str_rev(name);  // evaD
+    let reversed = jstring::str_rev(name); // evaD
+    println!("{} <-> {}", name, reversed);
 
     let name = "anna";
     println!("{} is palindrome: {}", name, jstring::is_palindrome(name));
+}
+```
+
+### random
+
+```rust
+use jabba_lib::jrandom;
+
+fn main() {
+    let number = jrandom::randrange(1, 10); // 10 is excluded
+    println!("random number from [1, 10): {}", number);
+
+    let number = jrandom::randint(1, 100); // 100 is included
+    println!("random number from [1, 100]: {}", number);
+
+    let mut numbers = vec![1, 2, 3, 4, 5];
+    jrandom::shuffle(&mut numbers);
+    println!("shuffled: {:?}", numbers); // could be [3, 5, 1, 4, 2]
 }
 ```
 
@@ -59,17 +77,50 @@ You can install it with your package manager.
 Under Linux, the text is pasted on both clipboards (to "primary" and "clipboard").
 
 ```rust
-let text = "hello";
+use jabba_lib::jclipboard;
 
-jabba_lib::jclipboard::check();  // verify if your platform is supported
+fn main() {
+    let text = "hello";
 
-jabba_lib::jclipboard::set_text(text).unwrap();
-println!("The text {:?} was pasted on the clipboard", text);
+    jabba_lib::jclipboard::check(); // verify if your platform is supported
 
-let read = jabba_lib::jclipboard::get_text().unwrap();
-println!("Contents of the clipboard: {:?}", read);
+    jabba_lib::jclipboard::set_text(text).unwrap();
+    println!("The text {:?} was pasted on the clipboard", text);
 
-assert_eq!(read, text);
+    let read = jabba_lib::jclipboard::get_text().unwrap();
+    println!("Contents of the clipboard: {:?}", read);
+
+    assert_eq!(read, text);
+}
+```
+
+### spell
+
+Spell a number (write out in words).
+
+```rust
+use jabba_lib::jspell;
+
+fn main() {
+    assert_eq!(jspell::spell_number(5), "five");
+    assert_eq!(jspell::spell_number(11), "eleven");
+    assert_eq!(jspell::spell_number(101), "one hundred and one");
+    assert_eq!(jspell::spell_number(999), "nine hundred and ninety-nine");
+}
+```
+
+### time
+
+```rust
+use jabba_lib::jtime;
+
+fn main() {
+    let wait = 1.5;
+
+    println!("Waiting for {:.2} seconds...", wait);
+    jtime::sleep(wait);
+    println!("Done.");
+}
 ```
 
 See the folder [examples/](https://github.com/jabbalaci/jabba-lib/tree/main/examples)
