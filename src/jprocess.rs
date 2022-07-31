@@ -44,8 +44,7 @@ impl ProcStat {
 /// ```
 /// let commands = vec![
 ///     r#"python -c "print('Hello Rust!')""#,
-///     "python3 --version",
-///     "date",
+///     "python --version",
 /// ];
 ///
 /// for cmd in commands.iter() {
@@ -53,10 +52,10 @@ impl ProcStat {
 ///     println!("{:?}", stat);
 /// }
 ///
-/// let date = jabba_lib::jprocess::get_exitcode_stdout_stderr("rustc --version")
+/// let answer = jabba_lib::jprocess::get_exitcode_stdout_stderr("rustc --version")
 ///     .unwrap()
 ///     .trimmed_output(); // no trailing whitespaces
-/// println!("{:?}", date);
+/// println!("{:?}", answer);
 /// ```
 ///
 /// # Sample Output
@@ -64,7 +63,6 @@ impl ProcStat {
 /// ```text
 /// ProcStat { exit_code: 0, stdout: "Hello Rust!\n", stderr: "" }
 /// ProcStat { exit_code: 0, stdout: "Python 3.10.5\n", stderr: "" }
-/// ProcStat { exit_code: 0, stdout: "2022. júl. 31., vasárnap, 12:29:23 CEST\n", stderr: "" }
 /// "rustc 1.62.1 (e092d0b6b 2022-07-16)"
 /// ```
 pub fn get_exitcode_stdout_stderr(cmd: &str) -> Option<ProcStat> {
@@ -98,27 +96,14 @@ pub fn get_exitcode_stdout_stderr(cmd: &str) -> Option<ProcStat> {
 /// # Examples
 ///
 /// ```
-/// let cmd = "ls -al";
+/// let cmd = "rustc --version";
 /// jabba_lib::jprocess::exec_cmd(cmd);
 /// ```
 ///
 /// # Sample Output
 ///
 /// ```text
-/// total 60
-/// drwxr-xr-x 8 jabba jabba 4096 júl   31 07.06 .
-/// drwxr-xr-x 6 jabba jabba 4096 júl   30 13.44 ..
-/// -rw-r--r-- 1 jabba jabba 5303 júl   31 11.57 Cargo.lock
-/// -rw-r--r-- 1 jabba jabba  646 júl   31 11.57 Cargo.toml
-/// drwxr-xr-x 2 jabba jabba 4096 júl   31 11.56 examples
-/// drwxr-xr-x 8 jabba jabba 4096 júl   31 16.32 .git
-/// -rw-r--r-- 1 jabba jabba   34 júl   18 09.20 .gitignore
-/// -rw-r--r-- 1 jabba jabba 1067 júl    9 20.40 LICENSE
-/// -rw-r--r-- 1 jabba jabba  133 júl   18 10.44 Makefile
-/// -rw-r--r-- 1 jabba jabba 2828 júl   30 14.40 README.md
-/// drwxr-xr-x 2 jabba jabba 4096 júl   31 11.53 src
-/// drwxr-xr-x 4 jabba jabba 4096 júl   31 12.26 target
-/// drwxr-xr-x 2 jabba jabba 4096 júl   12 20.21 .vscode
+/// rustc 1.62.1 (e092d0b6b 2022-07-16)
 /// ```
 pub fn exec_cmd(cmd: &str) {
     let parts = shlex::split(cmd).unwrap();
@@ -127,7 +112,7 @@ pub fn exec_cmd(cmd: &str) {
 
     let mut p = process::Command::new(head);
     p.args(tail);
-    let mut child = p.spawn().expect("command failed to start");
+    let mut child = p.spawn().unwrap_or_else(|_| panic!("command {:?} failed to start", cmd));
     child.wait().expect("command wasn't running");
 }
 
@@ -201,7 +186,7 @@ mod tests {
 
     #[test]
     fn exec_cmd_test() {
-        let cmd = "date";
+        let cmd = "rustc --version";
         exec_cmd(cmd);
     }
 }
