@@ -34,6 +34,8 @@ impl ProcStat {
 
 /// Executes an external command and gets its exit code, stdout and stderr.
 ///
+/// It waits for the command to complete.
+///
 /// The three values are returned in a `ProcStat` structure.
 ///
 /// The command must be a simple command with some optional arguments.
@@ -85,10 +87,10 @@ pub fn get_exitcode_stdout_stderr(cmd: &str) -> Option<ProcStat> {
     Some(result)
 }
 
-/// Executes an external command.
+/// Executes an external command and waits for it to complete.
 ///
 /// The command's output goes to stdout (i.e., not captured).
-/// Similar to Python's `os.system()`.
+/// Similar to Python's `os.system("something")`.
 ///
 /// The command must be a simple command with some optional arguments.
 /// Pipes, redirections are not allowed.
@@ -112,8 +114,41 @@ pub fn exec_cmd(cmd: &str) {
 
     let mut p = process::Command::new(head);
     p.args(tail);
-    let mut child = p.spawn().unwrap_or_else(|_| panic!("command {:?} failed to start", cmd));
+    let mut child = p
+        .spawn()
+        .unwrap_or_else(|_| panic!("command {:?} failed to start", cmd));
     child.wait().expect("command wasn't running");
+}
+
+/// Executes an external command in the background (i.e., it doesn't wait for it to complete).
+///
+/// The command's output goes to stdout (i.e., not captured).
+/// Similar to Python's `os.system("something &")`.
+///
+/// The command must be a simple command with some optional arguments.
+/// Pipes, redirections are not allowed.
+///
+/// # Examples
+///
+/// ```
+/// let cmd = "rustc --version";
+/// jabba_lib::jprocess::exec_cmd_in_bg(cmd);
+/// ```
+///
+/// # Sample Output
+///
+/// ```text
+/// rustc 1.62.1 (e092d0b6b 2022-07-16)
+/// ```
+pub fn exec_cmd_in_bg(cmd: &str) {
+    let parts = shlex::split(cmd).unwrap();
+    let head = &parts[0];
+    let tail = &parts[1..];
+
+    process::Command::new(head)
+        .args(tail)
+        .spawn()
+        .unwrap_or_else(|_| panic!("command {:?} failed to start", cmd));
 }
 
 // ==========================================================================
@@ -188,5 +223,11 @@ mod tests {
     fn exec_cmd_test() {
         let cmd = "rustc --version";
         exec_cmd(cmd);
+    }
+
+    #[test]
+    fn exec_cmd_in_bg_test() {
+        let cmd = "rustc --version";
+        exec_cmd_in_bg(cmd);
     }
 }
