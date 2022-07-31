@@ -1,6 +1,6 @@
 //! # jabba_lib
 //!
-//! `jabba_lib` is a collection of utilities. The API was mainly inspired by
+//! `jabba_lib` is a general-purpose utility library. The API was mainly inspired by
 //! the Python programming language.
 
 pub mod jclipboard;
@@ -9,6 +9,7 @@ pub mod jfs;
 pub mod jmath;
 pub mod jos;
 pub mod jpermutation;
+pub mod jprocess;
 pub mod jrandom;
 pub mod jspell;
 pub mod jstring;

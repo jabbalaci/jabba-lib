@@ -68,13 +68,13 @@ pub fn set_text(text: &str) -> Result<(), &'static str> {
     cfg_if::cfg_if! {
         if #[cfg(windows)] {
             set_text_windows(text)?;
-            Ok(())
+            return Ok(());
         } else if #[cfg(unix)] {
             let result = set_text_linux(text);
-            match result {
+            return match result {
                 Ok(_) => Ok(()),
                 Err(_) => Err("Error: cannot write to clipboard"),
-            }
+            };
         } else {
             let platform = jos::get_operating_system_name();
             panic!("Error: unknown platform {}", platform);
