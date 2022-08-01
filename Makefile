@@ -7,3 +7,7 @@ test:
 
 doc:
 	cargo doc --open
+
+clean:
+	cargo clean
+	rm ./out.*.txt

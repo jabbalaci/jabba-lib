@@ -3,3 +3,4 @@ target/
 old/
 
 Cargo.lock
+out.*.txt
