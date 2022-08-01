@@ -1,4 +1,5 @@
 use jabba_lib::jfs;
+use std::io::BufRead;
 
 fn main() {
     let lines = jfs::readlines("Cargo.toml").unwrap();
@@ -6,4 +7,10 @@ fn main() {
     println!("---");
     let content = jfs::read("Cargo.toml").unwrap();
     println!("Number of characters in Cargo.toml: {}", content.len());
+    println!("---");
+    let f = jfs::open("Cargo.toml").unwrap();
+    for line in f.lines() {
+        let line = line.unwrap();
+        println!("{}", line);
+    }
 }

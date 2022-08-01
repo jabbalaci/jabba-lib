@@ -38,6 +38,39 @@ pub fn read(fname: &str) -> io::Result<String> {
     fs::read_to_string(fname)
 }
 
+/// Opens a file for reading.
+///
+/// With this, you can read a file line by line.
+///
+/// It is similar to Python's `f = open("text.txt")`.
+///
+/// # Examples
+///
+/// ```
+/// use std::io::BufRead;
+///
+/// let f = jabba_lib::jfs::open("Cargo.toml").unwrap();
+/// for line in f.lines() {
+///     let line = line.unwrap();
+///     println!("{}", line);
+/// }
+/// ```
+///
+/// In Python, it would look like this:
+///
+/// ```python
+/// f = open("Cargo.toml")
+/// for line in f:
+///     line = line.rstrip("\n")
+///     print(line)
+/// ```
+pub fn open(fname: &str) -> io::Result<BufReader<File>> {
+    let file = File::open(fname)?;
+    let reader = BufReader::new(file);
+
+    Ok(reader)
+}
+
 // ==========================================================================
 
 #[cfg(test)]
@@ -56,5 +89,15 @@ mod tests {
         let fname = "Cargo.toml";
         let content = read(fname).unwrap();
         assert_eq!(content.is_empty(), false);
+    }
+
+    #[test]
+    fn open_test1() {
+        let fname = "Cargo.toml";
+        let f = open(fname).unwrap();
+        for line in f.lines() {
+            let line = line.unwrap();
+            println!("{}", line);
+        }
     }
 }

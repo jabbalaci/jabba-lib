@@ -10,6 +10,8 @@ and --in most cases-- the modules contain more functions than shown below.
 
 ### console
 
+Read from the stadandard input.
+
 ```rust
 use jabba_lib::jconsole;
 
@@ -30,6 +32,23 @@ use jabba_lib::jprocess as jproc;
 fn main() {
     let cmd = "ls -al";
     jproc::exec_cmd(cmd);
+}
+```
+
+### fs
+
+Read a text file line by line.
+
+```rust
+use jabba_lib::jfs;
+use std::io::BufRead;
+
+fn main() {
+    let f = jfs::open("Cargo.toml").unwrap();
+    for line in f.lines() {
+        let line = line.unwrap();
+        println!("{}", line);
+    }
 }
 ```
 
