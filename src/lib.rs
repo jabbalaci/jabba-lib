@@ -10,6 +10,7 @@ pub mod jmath;
 pub mod jos;
 pub mod jpermutation;
 pub mod jprocess;
+pub mod jpy;
 pub mod jrandom;
 pub mod jspell;
 pub mod jstring;
