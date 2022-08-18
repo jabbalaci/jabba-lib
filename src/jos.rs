@@ -39,16 +39,22 @@ pub fn is_windows() -> bool {
 
 /// Returns an estimate of the default amount of parallelism a program should use.
 ///
+/// In case of error, it returns 1.
+///
+/// Error can happen in the following cases (and thus, 1 is returned):
+/// - If the amount of parallelism is not known for the target platform.
+/// - If the program lacks permission to query the amount of parallelism made available to it.
+///
 /// # Examples
 ///
 /// ```
-/// let value = jabba_lib::jos::get_available_parallelism().unwrap_or(1);
+/// let value = jabba_lib::jos::get_available_parallelism();
 /// assert!(value >= 1);
 /// ```
-pub fn get_available_parallelism() -> Option<usize> {
+pub fn get_available_parallelism() -> usize {
     match std::thread::available_parallelism() {
-        Ok(value) => Some(value.into()),
-        _ => None,
+        Ok(value) => value.into(),
+        _ => 1,
     }
 }
 
@@ -75,7 +81,7 @@ mod tests {
 
     #[test]
     fn get_available_parallelism_test() {
-        let value = get_available_parallelism().unwrap_or(1);
+        let value = get_available_parallelism();
         assert!(value >= 1);
     }
 }

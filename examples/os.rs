@@ -13,6 +13,6 @@ fn main() {
         if jos::is_windows() { "yes" } else { "no" }
     );
 
-    let value = jabba_lib::jos::get_available_parallelism().unwrap_or(1);
+    let value = jabba_lib::jos::get_available_parallelism();
     println!("Available parallelism: {}", value);
 }
