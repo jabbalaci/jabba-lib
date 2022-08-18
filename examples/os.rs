@@ -12,4 +12,7 @@ fn main() {
         "Is it Windows? {}",
         if jos::is_windows() { "yes" } else { "no" }
     );
+
+    let value = jabba_lib::jos::get_available_parallelism().unwrap_or(1);
+    println!("Available parallelism: {}", value);
 }

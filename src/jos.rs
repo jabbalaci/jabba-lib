@@ -1,6 +1,6 @@
 //! connection to the operating system
 
-use std::env;
+use std::{self, env};
 
 /// Returns the short name of the underlying operating system.
 ///
@@ -37,6 +37,21 @@ pub fn is_windows() -> bool {
     get_operating_system_name() == "windows"
 }
 
+/// Returns an estimate of the default amount of parallelism a program should use.
+///
+/// # Examples
+///
+/// ```
+/// let value = jabba_lib::jos::get_available_parallelism().unwrap_or(1);
+/// assert!(value >= 1);
+/// ```
+pub fn get_available_parallelism() -> Option<usize> {
+    match std::thread::available_parallelism() {
+        Ok(value) => Some(value.into()),
+        _ => None,
+    }
+}
+
 // ==========================================================================
 
 #[cfg(test)]
@@ -56,5 +71,11 @@ mod tests {
     #[test]
     fn is_windows_test() {
         assert!(is_windows() != is_linux());
+    }
+
+    #[test]
+    fn get_available_parallelism_test() {
+        let value = get_available_parallelism().unwrap_or(1);
+        assert!(value >= 1);
     }
 }
